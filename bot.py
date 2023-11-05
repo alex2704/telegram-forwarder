@@ -1,5 +1,6 @@
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
+from telethon.tl.types import PeerChat
 import logging
 import os
 
@@ -22,6 +23,16 @@ except Exception as ap:
     exit(1)
 
 
+async def prepare_link(event):
+    if event.is_group:
+        entity = await client.get_entity(PeerChat(abs(event.message.chat_id)))
+        return f'\n\n Переслано из чата {entity.title}'
+    chat_title = event.chat.title
+    user_id = event.chat.username
+    telegram_link = f'https://t.me/{user_id}/{event.message.id}'
+    return f'\n\n Переслано из [{chat_title}]({telegram_link})'
+
+
 @client.on(events.NewMessage(incoming=True))
 async def sender_client(event):
     if event.is_group or event.is_channel:
@@ -29,11 +40,8 @@ async def sender_client(event):
         for substr in KEYWORD:
             if substr in event_message:
                 entity = await client.get_input_entity(TO)
-                user_id = event.chat.username
-                chat_title = event.chat.title
-                telegram_link = f'tg://openmessage?chat_id={user_id}&message_id={event.message.id}'
-                # telegram_link = f'https://t.me/{user_id}/{event.message.id}'
-                message = f'#{substr}\n\n' + event_message + f'\n\n Переслано из [{chat_title}]({telegram_link})'
+                link = await prepare_link(event)
+                message = f'#{substr}\n\n' + event_message + link
                 try:
                     await client.send_message(entity, message, link_preview=False)
                 except Exception as e:
