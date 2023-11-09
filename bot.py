@@ -12,8 +12,10 @@ APP_ID = int(os.getenv("APP_ID"))
 API_HASH = os.getenv("API_HASH")
 SESSION = os.getenv("SESSION")
 TO = os.getenv("TO_CHANNEL")
-KEYWORD_ = "цветы цветов"
-KEYWORD = [str(i) for i in KEYWORD_.split()]
+KEYWORD_ = "Цветы Цветов Букет Букеты Букетов Розы Роза Пионы Пион Гортензии Гортензия Елка Ель Шарики Подарок Подарки " \
+           "День рождение День рождения Свадьба Игрушка Игрушки Сладости Др Праздник Декорации Торт Тортик Панкейк " \
+           "Бенто Bento Розы Роза Тюльпаны Тюльпан  Лютик Лютики Цветочный  Флористика"
+KEYWORD = [str(i) for i in KEYWORD_.lower().split()]
 
 try:
     client = TelegramClient(StringSession(SESSION), APP_ID, API_HASH, system_version='4.16.30-vxCUSTOM')
@@ -38,7 +40,7 @@ async def sender_client(event):
     if event.is_group or event.is_channel:
         event_message = event.message.message
         for substr in KEYWORD:
-            if substr in event_message:
+            if substr in event_message.lower():
                 entity = await client.get_input_entity(TO)
                 link = await prepare_link(event)
                 message = f'#{substr}\n\n' + event_message + link
