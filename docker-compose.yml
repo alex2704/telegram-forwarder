@@ -1,0 +1,17 @@
+version: "2.1"
+
+services:
+  telegram_forwarder:
+    image: bay2704/telegramforwarder
+    container_name: telegramforwarder
+    environment:
+      - APP_ID={APP_ID}
+      - API_HASH={API_HASH}
+      - SESSION={SESSION_STRING OR SESSION PATH}
+      - TO_CHANNEL={CHANNEL_NAME}
+    volumes:
+      - session_path:/var/tgsessions
+    ports:
+      - 80:80
+volumes:
+  session_path:
